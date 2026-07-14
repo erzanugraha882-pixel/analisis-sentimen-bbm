@@ -162,38 +162,16 @@ with col2:
     if st.button("🗑 Bersihkan", use_container_width=True):
         st.rerun()
 
-# =====================================================
-# Contoh Komentar
-# =====================================================
+
 
 st.divider()
 
-st.subheader("Contoh Komentar")
 
-st.info("""
-✅ Positif  
-Program BBM Etanol merupakan inovasi yang baik dan lebih ramah lingkungan.
-""")
-
-st.warning("""
-🟡 Netral  
-Saya masih menunggu informasi lebih lanjut mengenai program BBM Etanol.
-""")
-
-st.error("""
-🔴 Negatif  
-Program BBM Etanol hanya akan membuat harga BBM naik dan merugikan masyarakat.
-""")
 
 # =====================================================
 # Footer
 # =====================================================
 
 st.markdown("""
-<div class="footer">
 
-Analisis Sentimen Komentar Masyarakat terhadap Program BBM Etanol  
-Menggunakan Metode Logistic Regression
-
-</div>
 """, unsafe_allow_html=True)
