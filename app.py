@@ -4,8 +4,16 @@ import joblib
 # ==========================
 # Load Model
 # ==========================
-model = joblib.load("model.pkl")
-tfidf = joblib.load("tfidf.pkl")
+import os
+import streamlit as st
+
+try:
+    model = joblib.load("model.pkl")
+    tfidf = joblib.load("tfidf.pkl")
+    st.success("Model berhasil dimuat")
+except Exception as e:
+    st.error(e)
+    st.stop()
 
 # ==========================
 # Konfigurasi Halaman
