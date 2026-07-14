@@ -8,8 +8,18 @@ import os
 import streamlit as st
 
 try:
+    import os
+
+st.write("Python berjalan")
+st.write("Isi folder:", os.listdir())
+
+try:
     model = joblib.load("model.pkl")
     tfidf = joblib.load("tfidf.pkl")
+    st.success("Model berhasil dimuat")
+except Exception as e:
+    st.error(f"Error saat load model: {e}")
+    st.stop()
     st.success("Model berhasil dimuat")
 except Exception as e:
     st.error(e)
