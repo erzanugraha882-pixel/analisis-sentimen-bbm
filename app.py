@@ -1,166 +1,199 @@
 import streamlit as st
 import joblib
-import os
 
-# ==========================
+# =====================================================
 # Konfigurasi Halaman
-# ==========================
+# =====================================================
 st.set_page_config(
     page_title="Analisis Sentimen BBM Etanol",
     page_icon="⛽",
     layout="centered"
 )
 
-# ==========================
-# Debug (boleh dihapus setelah deploy berhasil)
-# ==========================
-st.write("Python berjalan")
-st.write("Isi folder:", os.listdir())
-
-# ==========================
+# =====================================================
 # Load Model
-# ==========================
+# =====================================================
 try:
     model = joblib.load("model.pkl")
     tfidf = joblib.load("tfidf.pkl")
-    st.success("✅ Model dan TF-IDF berhasil dimuat")
-
 except Exception as e:
-    st.error(f"❌ Gagal memuat model: {e}")
+    st.error(f"Gagal memuat model: {e}")
     st.stop()
 
-# ==========================
+# =====================================================
 # CSS
-# ==========================
+# =====================================================
 st.markdown("""
 <style>
 
 .main{
-    background-color:#f8f9fa;
+    background:#f8f9fa;
 }
 
 .title-box{
     background: linear-gradient(90deg,#0d6efd,#198754);
-    padding:20px;
+    padding:22px;
     border-radius:15px;
-    text-align:center;
     color:white;
+    text-align:center;
 }
 
 .info-box{
-    background:#ffffff;
-    padding:15px;
+    background:white;
+    padding:18px;
     border-radius:10px;
     border-left:6px solid #0d6efd;
-    margin-top:10px;
-    margin-bottom:20px;
+    margin-top:15px;
+    margin-bottom:15px;
 }
 
 .result-box{
     padding:18px;
-    border-radius:10px;
+    border-radius:12px;
     text-align:center;
-    font-size:24px;
+    font-size:26px;
     font-weight:bold;
 }
 
 .footer{
     text-align:center;
     color:gray;
-    margin-top:40px;
     font-size:14px;
+    margin-top:30px;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ==========================
+# =====================================================
 # Header
-# ==========================
+# =====================================================
 st.markdown("""
 <div class="title-box">
 <h1>⛽ Analisis Sentimen BBM Etanol</h1>
-<h4>Metode Logistic Regression</h4>
+<h3>Menggunakan Metode Logistic Regression</h3>
 </div>
 """, unsafe_allow_html=True)
+
+# =====================================================
+# Informasi Penelitian
+# =====================================================
 
 st.markdown("""
 <div class="info-box">
-Aplikasi ini digunakan untuk melakukan klasifikasi sentimen komentar masyarakat terhadap program BBM Etanol menjadi <b>Positif</b>, <b>Netral</b>, atau <b>Negatif</b>.
+
+### Informasi Penelitian
+
+- **Metode Klasifikasi :** Logistic Regression
+- **Ekstraksi Fitur :** TF-IDF
+- **Penanganan Data Tidak Seimbang :** SMOTE
+- **Skenario Terbaik :** Split Data 90% Training : 10% Testing
+
+Masukkan komentar mengenai program BBM Etanol, kemudian sistem akan mengklasifikasikan sentimen menjadi Positif, Netral, atau Negatif.
+
 </div>
 """, unsafe_allow_html=True)
 
-# ==========================
+# =====================================================
 # Input
-# ==========================
+# =====================================================
+
 komentar = st.text_area(
     "Masukkan Komentar",
-    placeholder="Contoh: Program BBM Etanol sangat bagus dan ramah lingkungan..."
+    placeholder="Contoh : Program BBM Etanol sangat bagus dan ramah lingkungan."
 )
 
-# ==========================
-# Prediksi
-# ==========================
-if st.button("🔍 Analisis Sentimen", use_container_width=True):
+col1, col2 = st.columns(2)
 
-    if komentar.strip() == "":
-        st.warning("Silakan masukkan komentar terlebih dahulu.")
+with col1:
+    if st.button("🔍 Analisis Sentimen", use_container_width=True):
 
-    else:
-
-        # TF-IDF
-        data = tfidf.transform([komentar])
-
-        # Prediksi
-        prediksi = model.predict(data)[0]
-        probabilitas = model.predict_proba(data)[0]
-
-        # Hasil
-        if prediksi == -1:
-
-            st.markdown("""
-            <div class="result-box" style="background:#f8d7da;color:#b02a37;">
-            🔴 NEGATIF
-            </div>
-            """, unsafe_allow_html=True)
-
-        elif prediksi == 0:
-
-            st.markdown("""
-            <div class="result-box" style="background:#fff3cd;color:#856404;">
-            🟡 NETRAL
-            </div>
-            """, unsafe_allow_html=True)
+        if komentar.strip() == "":
+            st.warning("Silakan masukkan komentar terlebih dahulu.")
 
         else:
 
-            st.markdown("""
-            <div class="result-box" style="background:#d1e7dd;color:#146c43;">
-            🟢 POSITIF
-            </div>
-            """, unsafe_allow_html=True)
+            data = tfidf.transform([komentar])
 
-        st.divider()
+            prediksi = model.predict(data)[0]
+            probabilitas = model.predict_proba(data)[0]
 
-        st.subheader("📊 Probabilitas Prediksi")
+            if prediksi == -1:
 
-        st.write("Negatif")
-        st.progress(float(probabilitas[0]))
-        st.write(f"**{probabilitas[0]*100:.2f}%**")
+                st.markdown("""
+                <div class="result-box" style="background:#f8d7da;color:#842029;">
+                🔴 NEGATIF
+                </div>
+                """, unsafe_allow_html=True)
 
-        st.write("Netral")
-        st.progress(float(probabilitas[1]))
-        st.write(f"**{probabilitas[1]*100:.2f}%**")
+            elif prediksi == 0:
 
-        st.write("Positif")
-        st.progress(float(probabilitas[2]))
-        st.write(f"**{probabilitas[2]*100:.2f}%**")
+                st.markdown("""
+                <div class="result-box" style="background:#fff3cd;color:#664d03;">
+                🟡 NETRAL
+                </div>
+                """, unsafe_allow_html=True)
 
-# ==========================
+            else:
+
+                st.markdown("""
+                <div class="result-box" style="background:#d1e7dd;color:#0f5132;">
+                🟢 POSITIF
+                </div>
+                """, unsafe_allow_html=True)
+
+            st.divider()
+
+            st.subheader("📊 Probabilitas Prediksi")
+
+            st.write("Negatif")
+            st.progress(float(probabilitas[0]))
+            st.write(f"{probabilitas[0]*100:.2f}%")
+
+            st.write("Netral")
+            st.progress(float(probabilitas[1]))
+            st.write(f"{probabilitas[1]*100:.2f}%")
+
+            st.write("Positif")
+            st.progress(float(probabilitas[2]))
+            st.write(f"{probabilitas[2]*100:.2f}%")
+
+with col2:
+    if st.button("🗑 Bersihkan", use_container_width=True):
+        st.rerun()
+
+# =====================================================
+# Contoh Komentar
+# =====================================================
+
+st.divider()
+
+st.subheader("Contoh Komentar")
+
+st.info("""
+✅ Positif  
+Program BBM Etanol merupakan inovasi yang baik dan lebih ramah lingkungan.
+""")
+
+st.warning("""
+🟡 Netral  
+Saya masih menunggu informasi lebih lanjut mengenai program BBM Etanol.
+""")
+
+st.error("""
+🔴 Negatif  
+Program BBM Etanol hanya akan membuat harga BBM naik dan merugikan masyarakat.
+""")
+
+# =====================================================
 # Footer
-# ==========================
+# =====================================================
+
 st.markdown("""
 <div class="footer">
-Dibuat untuk penelitian Analisis Sentimen BBM Etanol menggunakan Logistic Regression
+
+Analisis Sentimen Komentar Masyarakat terhadap Program BBM Etanol  
+Menggunakan Metode Logistic Regression
+
 </div>
 """, unsafe_allow_html=True)
