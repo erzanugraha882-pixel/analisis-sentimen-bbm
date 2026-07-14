@@ -1,29 +1,6 @@
 import streamlit as st
 import joblib
-
-# ==========================
-# Load Model
-# ==========================
 import os
-import streamlit as st
-
-try:
-    import os
-
-st.write("Python berjalan")
-st.write("Isi folder:", os.listdir())
-
-try:
-    model = joblib.load("model.pkl")
-    tfidf = joblib.load("tfidf.pkl")
-    st.success("Model berhasil dimuat")
-except Exception as e:
-    st.error(f"Error saat load model: {e}")
-    st.stop()
-    st.success("Model berhasil dimuat")
-except Exception as e:
-    st.error(e)
-    st.stop()
 
 # ==========================
 # Konfigurasi Halaman
@@ -33,6 +10,24 @@ st.set_page_config(
     page_icon="⛽",
     layout="centered"
 )
+
+# ==========================
+# Debug (boleh dihapus setelah deploy berhasil)
+# ==========================
+st.write("Python berjalan")
+st.write("Isi folder:", os.listdir())
+
+# ==========================
+# Load Model
+# ==========================
+try:
+    model = joblib.load("model.pkl")
+    tfidf = joblib.load("tfidf.pkl")
+    st.success("✅ Model dan TF-IDF berhasil dimuat")
+
+except Exception as e:
+    st.error(f"❌ Gagal memuat model: {e}")
+    st.stop()
 
 # ==========================
 # CSS
@@ -91,8 +86,7 @@ st.markdown("""
 
 st.markdown("""
 <div class="info-box">
-Aplikasi ini digunakan untuk melakukan klasifikasi sentimen komentar masyarakat
-terhadap program BBM Etanol menjadi <b>Positif</b>, <b>Netral</b>, atau <b>Negatif</b>.
+Aplikasi ini digunakan untuk melakukan klasifikasi sentimen komentar masyarakat terhadap program BBM Etanol menjadi <b>Positif</b>, <b>Netral</b>, atau <b>Negatif</b>.
 </div>
 """, unsafe_allow_html=True)
 
@@ -114,12 +108,14 @@ if st.button("🔍 Analisis Sentimen", use_container_width=True):
 
     else:
 
+        # TF-IDF
         data = tfidf.transform([komentar])
 
+        # Prediksi
         prediksi = model.predict(data)[0]
         probabilitas = model.predict_proba(data)[0]
 
-        # Hasil Prediksi
+        # Hasil
         if prediksi == -1:
 
             st.markdown("""
@@ -164,5 +160,7 @@ if st.button("🔍 Analisis Sentimen", use_container_width=True):
 # Footer
 # ==========================
 st.markdown("""
-
+<div class="footer">
+Dibuat untuk penelitian Analisis Sentimen BBM Etanol menggunakan Logistic Regression
+</div>
 """, unsafe_allow_html=True)
